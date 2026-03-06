@@ -10,21 +10,32 @@ export default function Sidebar({
   currentSection,
   onSectionChange,
   onNavigatePremium,
+  isMobile = false,
+  isOpen = true,
+  onClose,
 }) {
   const isDark = theme === 'dark';
 
   const sections = [
-    { name: 'Dashboard', icon: '📊' },
-    { name: 'Expenses', icon: '💸' },
-    { name: 'Income', icon: '💰' },
-    { name: 'Analytics', icon: '📈' },
-    { name: 'Budget', icon: '🎯' },
-    { name: 'Calendar', icon: '📅' },
-    { name: 'AI Assistant', icon: '🤖' },
+    { name: 'Dashboard', icon: 'DB' },
+    { name: 'Expenses', icon: 'EX' },
+    { name: 'Income', icon: 'IN' },
+    { name: 'Analytics', icon: 'AN' },
+    { name: 'Budget', icon: 'BG' },
+    { name: 'Calendar', icon: 'CL' },
+    { name: 'AI Assistant', icon: 'AI' },
   ];
 
-  return (
-    <div style={{ ...styles.sidebar, backgroundColor: themeColors.cardBg, borderRight: `1px solid ${themeColors.border}` }}>
+  const panel = (
+    <div
+      style={{
+        ...styles.sidebar,
+        ...(isMobile ? styles.sidebarMobile : null),
+        ...(isMobile && isOpen ? styles.sidebarMobileOpen : null),
+        backgroundColor: themeColors.cardBg,
+        borderRight: `1px solid ${themeColors.border}`,
+      }}
+    >
       <div style={{ ...styles.header, borderBottom: `1px solid ${themeColors.border}` }}>
         <h1 style={{ ...styles.logo, color: themeColors.text }}>
           <span style={styles.logoWrap}>
@@ -33,7 +44,7 @@ export default function Sidebar({
           </span>
         </h1>
         <button onClick={toggleTheme} style={{ ...styles.themeBtn, color: themeColors.text }}>
-          {isDark ? '☀️' : '🌙'}
+          {isDark ? 'Light' : 'Dark'}
         </button>
       </div>
 
@@ -53,7 +64,10 @@ export default function Sidebar({
         {sections.map((section) => (
           <button
             key={section.name}
-            onClick={() => onSectionChange(section.name)}
+            onClick={() => {
+              onSectionChange(section.name);
+              if (isMobile && onClose) onClose();
+            }}
             style={{
               ...styles.navItem,
               backgroundColor:
@@ -70,14 +84,34 @@ export default function Sidebar({
       </nav>
 
       <div style={{ ...styles.footer, borderTop: `1px solid ${themeColors.border}` }}>
-        <button onClick={onNavigatePremium} style={{ ...styles.investBtn, marginBottom: '10px', backgroundColor: 'rgba(102,126,234,0.1)', color: themeColors.accent }}>
-          ✨ Go Premium
+        <button
+          onClick={() => {
+            onNavigatePremium();
+            if (isMobile && onClose) onClose();
+          }}
+          style={{
+            ...styles.investBtn,
+            marginBottom: '10px',
+            backgroundColor: 'rgba(102,126,234,0.1)',
+            color: themeColors.accent,
+          }}
+        >
+          Go Premium
         </button>
         <button onClick={onLogout} style={{ ...styles.logoutBtn, color: '#dc2626' }}>
-          🚪 Logout
+          Logout
         </button>
       </div>
     </div>
+  );
+
+  if (!isMobile) return panel;
+
+  return (
+    <>
+      {isOpen && <div onClick={onClose} style={styles.overlay} />}
+      {panel}
+    </>
   );
 }
 
@@ -91,6 +125,24 @@ const styles = {
     overflow: 'auto',
     position: 'relative',
     zIndex: 1,
+  },
+  sidebarMobile: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    transform: 'translateX(-100%)',
+    transition: 'transform 0.25s ease',
+    zIndex: 1001,
+  },
+  sidebarMobileOpen: {
+    transform: 'translateX(0)',
+  },
+  overlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.45)',
+    zIndex: 1000,
   },
   header: {
     padding: '20px',

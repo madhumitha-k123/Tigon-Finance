@@ -16,8 +16,30 @@ export default class Dashboard extends React.Component {
       expenseDescription: '',
       income: storedIncome,
       newIncome: storedIncome || '',
+      isMobile: typeof window !== 'undefined' ? window.innerWidth <= 900 : false,
+      isSidebarOpen: false,
     };
   }
+
+  componentDidMount() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', this.handleResize);
+    }
+  }
+
+  componentWillUnmount() {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.handleResize);
+    }
+  }
+
+  handleResize = () => {
+    const nextIsMobile = window.innerWidth <= 900;
+    this.setState((prev) => {
+      if (prev.isMobile === nextIsMobile) return null;
+      return { isMobile: nextIsMobile, isSidebarOpen: nextIsMobile ? prev.isSidebarOpen : false };
+    });
+  };
 
   handleAddExpense = (e) => {
     e.preventDefault();
@@ -301,19 +323,49 @@ export default class Dashboard extends React.Component {
 
   render() {
     const { theme, user, onLogout, toggleTheme, themeColors, onNavigatePremium } = this.props;
+    const { isMobile, isSidebarOpen, currentSection } = this.state;
     return (
-      <div style={{ ...styles.container, backgroundColor: 'transparent', color: themeColors.text }}>
+      <div
+        style={{
+          ...styles.container,
+          ...(isMobile ? styles.containerMobile : null),
+          backgroundColor: 'transparent',
+          color: themeColors.text,
+        }}
+      >
+        {isMobile && (
+          <div
+            style={{
+              ...styles.mobileTopBar,
+              backgroundColor: themeColors.cardBg,
+              borderBottom: `1px solid ${themeColors.border}`,
+              color: themeColors.text,
+            }}
+          >
+            <button
+              onClick={() => this.setState({ isSidebarOpen: true })}
+              style={{ ...styles.menuBtn, color: themeColors.text }}
+              aria-label="Open menu"
+            >
+              ☰
+            </button>
+            <div style={styles.mobileTitle}>{currentSection}</div>
+          </div>
+        )}
         <Sidebar
           user={user}
           onLogout={onLogout}
           theme={theme}
           toggleTheme={toggleTheme}
           themeColors={themeColors}
-          currentSection={this.state.currentSection}
+          currentSection={currentSection}
           onSectionChange={(section) => this.setState({ currentSection: section })}
           onNavigatePremium={onNavigatePremium}
+          isMobile={isMobile}
+          isOpen={!isMobile || isSidebarOpen}
+          onClose={() => this.setState({ isSidebarOpen: false })}
         />
-        <div style={styles.mainContent}>
+        <div style={{ ...styles.mainContent, ...(isMobile ? styles.mainContentMobile : null) }}>
           <div style={styles.contentWrapper}>{this.renderSection()}</div>
         </div>
       </div>
@@ -329,12 +381,38 @@ const styles = {
     zIndex: 1,
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },
+  containerMobile: {
+    display: 'block',
+  },
+  mobileTopBar: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 999,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '12px 16px',
+  },
+  menuBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '24px',
+    cursor: 'pointer',
+    lineHeight: 1,
+  },
+  mobileTitle: {
+    fontSize: '16px',
+    fontWeight: '700',
+  },
   mainContent: {
     flex: 1,
     overflow: 'auto',
     padding: '20px',
     position: 'relative',
     zIndex: 1,
+  },
+  mainContentMobile: {
+    padding: '14px',
   },
   contentWrapper: {
     maxWidth: '1400px',
@@ -350,7 +428,7 @@ const sectionStyles = {
   },
   statsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
     gap: '20px',
   },
   statCard: {
@@ -424,6 +502,8 @@ const sectionStyles = {
   expenseItem: {
     display: 'flex',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    rowGap: '8px',
     padding: '12px',
     borderRadius: '8px',
     border: '1px solid',
@@ -440,6 +520,7 @@ const sectionStyles = {
   },
   incomeForm: {
     display: 'flex',
+    flexWrap: 'wrap',
     gap: '10px',
     alignItems: 'center',
   },

@@ -170,45 +170,47 @@ export default function Calendar({ user, themeColors }) {
         <button onClick={navNext} style={buttonStyle}>Next</button>
       </div>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-              <th
-                key={d}
-                style={{ padding: '5px', color: themeColors.textSecondary }}
-              >
-                {d}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {weeks.map((week, wi) => (
-            <tr key={wi}>
-              {week.map((date, di) => (
-                <td
-                  key={di}
-                  onClick={() => date && setSelectedDate(date)}
-                  style={{
-                    padding: '10px',
-                    border: '1px solid ' + themeColors.border,
-                    verticalAlign: 'top',
-                    height: '80px',
-                    backgroundColor:
-                      date && reminders[formatKey(date)]
-                        ? (reminders[formatKey(date)][0].color || '#e0f2fe') + '33' // add transparency
-                        : 'transparent',
-                    cursor: date ? 'pointer' : 'default',
-                  }}
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', minWidth: '560px', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+                <th
+                  key={d}
+                  style={{ padding: '5px', color: themeColors.textSecondary }}
                 >
-                  {date ? date.getDate() : ''}
-                </td>
+                  {d}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {weeks.map((week, wi) => (
+              <tr key={wi}>
+                {week.map((date, di) => (
+                  <td
+                    key={di}
+                    onClick={() => date && setSelectedDate(date)}
+                    style={{
+                      padding: '10px',
+                      border: '1px solid ' + themeColors.border,
+                      verticalAlign: 'top',
+                      height: '80px',
+                      backgroundColor:
+                        date && reminders[formatKey(date)]
+                          ? (reminders[formatKey(date)][0].color || '#e0f2fe') + '33' // add transparency
+                          : 'transparent',
+                      cursor: date ? 'pointer' : 'default',
+                    }}
+                  >
+                    {date ? date.getDate() : ''}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {selectedDate && (
         <div
@@ -222,6 +224,8 @@ export default function Calendar({ user, themeColors }) {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            padding: '12px',
+            overflowY: 'auto',
           }}
         >
           <div
@@ -229,7 +233,9 @@ export default function Calendar({ user, themeColors }) {
               backgroundColor: themeColors.cardBg,
               padding: '20px',
               borderRadius: '8px',
-              width: '320px',
+              width: 'min(420px, 100%)',
+              maxHeight: 'calc(100vh - 24px)',
+              overflowY: 'auto',
             }}
           >
             <h4 style={{ margin: '0 0 10px 0' }}>

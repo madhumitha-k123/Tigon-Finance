@@ -215,7 +215,7 @@ export default function Premium({ user, themeColors, onClose }) {
       <div style={{ ...styles.card, backgroundColor: themeColors.cardBg, width: 'min(1000px, 96%)' }}>
         <button onClick={onClose} style={{ ...styles.closeBtn, color: themeColors.text }}>✕</button>
         <div style={{ textAlign: 'center' }}>
-          <h1 style={{ color: themeColors.text, fontSize: '48px', margin: 0 }}>✨ Go Premium</h1>
+          <h1 style={{ color: themeColors.text, fontSize: 'clamp(30px, 8vw, 48px)', margin: 0 }}>✨ Go Premium</h1>
           <p style={{ color: themeColors.textSecondary, fontSize: '16px', marginTop: '10px' }}>Unlock AI stock recommendations & investment insights</p>
 
           <div style={{ ...styles.priceBox, backgroundColor: themeColors.bg, border: `2px solid #667eea`, marginTop: '30px' }}>
@@ -257,11 +257,16 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9999,
+    padding: '16px',
+    overflowY: 'auto',
   },
   card: {
     borderRadius: '16px',
-    padding: '40px',
+    padding: '24px',
     maxWidth: '1100px',
+    width: '100%',
+    maxHeight: 'calc(100vh - 32px)',
+    overflowY: 'auto',
     boxShadow: '0 30px 80px rgba(0,0,0,0.5)',
     position: 'relative',
   },
